@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache>
+    <cache name="customers"
+           maxEntriesLocalHeap="1000"
+           eternal="false"
+           timeToLiveSeconds="3600"
+           timeToIdleSeconds="1800">
+        <persistence strategy="localTempSwap"/>
+    </cache>
+</ehcache>

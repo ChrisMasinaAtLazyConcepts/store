@@ -1,5 +1,7 @@
 package com.example.store.entity;
 
+import java.util.Set;
+
 import jakarta.persistence.*;
 
 import lombok.Data;
@@ -16,4 +18,11 @@ public class Order {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Customer customer;
+
+    @ManyToMany
+    @JoinTable(
+        name = "order_product",
+        joinColumns = @JoinColumn(name = "order_id"),
+        inverseJoinColumns = @JoinColumn(name = "product_id"))
+    private Set<Product> products;
 }

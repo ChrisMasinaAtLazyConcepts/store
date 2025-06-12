@@ -3,6 +3,7 @@ package com.example.store.controller;
 import com.example.store.entity.Customer;
 import com.example.store.entity.Order;
 import com.example.store.mapper.CustomerMapper;
+import com.example.store.mapper.OrderMapper;
 import com.example.store.repository.CustomerRepository;
 import com.example.store.repository.OrderRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,13 +21,16 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 import java.util.Optional;
+import com.example.store.mapper.OrderMapper;
 
-import static org.mockito.Mockito.when;
+import com.example.store.dto.OrderCustomerDTO;
+import com.example.store.dto.OrderDTO;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(OrderController.class)
-@ComponentScan(basePackageClasses = CustomerMapper.class)
+@ComponentScan(basePackageClasses = {CustomerMapper.class, OrderMapper.class})
 @RequiredArgsConstructor
 class OrderControllerTests {
 
@@ -78,5 +82,36 @@ class OrderControllerTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..description").value("Test Order"))
                 .andExpect(jsonPath("$..customer.name").value("John Doe"));
+    }
+
+ @Test
+    void testGetOrderByValidCustomerId() throws Exception {
+        String customerId = "1L";
+        OrderCustomerDTO customerOrder=  new OrderCustomerDTO();
+        customerOrder.setName(order.getCustomer().getName());
+        when(orderRepository.getOrderByCustomerId(customerId)).thenReturn(order);
+
+        mockMvc.perform(get("/" + customerId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
+                .andExpect(jsonPath("$.customerName").value("John Doe"));
+        verify(orderRepository, times(1)).getOrderByCustomerId(customerId);
+    }
+
+    @Test
+    void testGetOrderByEmptyCustomerId() throws Exception {
+        mockMvc.perform(get("/" + "")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void testGetOrderByNonExistingCustomerId() throws Exception {
+        String customerId = "123";
+        when(orderRepository.getOrderByCustomerId(customerId)).thenThrow(new RuntimeException("Test exception"));
+
+        mockMvc.perform(get("/" + customerId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isInternalServerError());
     }
 }

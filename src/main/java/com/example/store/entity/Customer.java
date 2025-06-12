@@ -10,6 +10,7 @@ import java.util.List;
 @Entity
 @Data
 public class Customer {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -18,4 +19,13 @@ public class Customer {
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Order> orders = new ArrayList<>();
+
+    public Customer(Long id, String name) {
+       this.id= id;
+       this.name= name;
+    }
+
+    public Customer() {
+    }
+
 }
