@@ -19,23 +19,40 @@ public class OrderController {
     private final OrderMapper orderMapper;
 
     /**
-     *Handles requests to get an order by customer by ID.
+     * Handles requests to get all orders.
      * 
-     * @param customerId : customerId of the order 
-     * @return OrderDTO object
+     * @return List of OrderDTO objects
      */
     @GetMapping
     public List<OrderDTO> getAllOrders() {
-        return orderRepository.findAllWithProducts()
+        return orderRepository.findAll()
             .stream()
             .map(orderMapper::orderToOrderDTO)
             .toList();
     }
 
+    @GetMapping("/by-products")
+    public List<Long> getOrderIdsByProductIds(@RequestParam List<Long> productIds) {
+        return orderRepository.findOrderIdsByProductIds(productIds);
+    }
+
     /**
-     *Handles requests to create an order
+     * Handles requests to get an order by ID.
      * 
-     * @param order : Order object 
+     * @param id : ID of the order
+     * @return OrderDTO object
+     */
+    @GetMapping("/{id}")
+    public OrderDTO getOrderById(@PathVariable Long id) {
+        return orderRepository.findById(id)
+            .map(orderMapper::orderToOrderDTO)
+            .orElseThrow(() -> new RuntimeException("Order not found with ID " + id));
+    }
+
+    /**
+     * Handles requests to create an order.
+     * 
+     * @param orderDTO : OrderDTO object
      * @return OrderDTO object of the created order
      */
     @PostMapping

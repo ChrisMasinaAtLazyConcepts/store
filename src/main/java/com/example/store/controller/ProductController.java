@@ -6,8 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.example.store.dto.ProductDTO;
 import com.example.store.entity.Product;
-import com.example.store.mapper.ProductMapper;
-import com.example.store.repository.ProductRepository;
+import com.example.store.service.*;
 
 import java.util.List;
 
@@ -16,28 +15,26 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProductController {
 
-    private final ProductRepository productRepository;
-    private final ProductMapper productMapper;
+    private final ProductService productService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ProductDTO createProduct(@RequestBody ProductDTO productDTO) {
-        Product product = productMapper.productDTOToProduct(productDTO);
-        return productMapper.productToProductDTO(productRepository.save(product));
+        return productService.createProduct(productDTO);
     }
 
     @GetMapping
     public List<ProductDTO> getAllProducts() {
-        return productRepository.findAll()
-            .stream()
-            .map(productMapper::productToProductDTO)
-            .toList();
+        return productService.getAllProducts();
     }
 
     @GetMapping("/{id}")
     public ProductDTO getProductById(@PathVariable Long id) {
-        return productRepository.findById(id)
-            .map(productMapper::productToProductDTO)
-            .orElseThrow(() -> new RuntimeException("Product not found"));
+      return productService.getProductById(id);
+    }
+
+    @GetMapping("/by-orders")
+    public List<Long> getProductIdsByOrderIds(@RequestParam List<Long> orderIds) {
+        return productService.getProductIdsByOrderIds(orderIds);
     }
 }

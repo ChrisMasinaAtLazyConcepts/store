@@ -58,7 +58,7 @@ The API is documented in the OpenAPI file OpenAPI.yaml. Note that this spec incl
       * A product has an ID and a description. 
       * Add a POST endpoint to create a product
       * Add a GET endpoint to return all products, and a specific product by ID
-        * In both cases, also return a list of the order IDs which contain those products
+      * In both cases, also return a list of the order IDs which contain those products
       * Change the orders endpoint to return a list of products contained in the order
 
 # Bonus points

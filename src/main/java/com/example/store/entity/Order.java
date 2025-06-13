@@ -1,6 +1,6 @@
 package com.example.store.entity;
 
-import java.util.Set;
+import java.util.List;
 
 import jakarta.persistence.*;
 
@@ -20,9 +20,5 @@ public class Order {
     private Customer customer;
 
     @ManyToMany
-    @JoinTable(
-        name = "order_product",
-        joinColumns = @JoinColumn(name = "order_id"),
-        inverseJoinColumns = @JoinColumn(name = "product_id"))
-    private Set<Product> products;
+    private List<Product> products;
 }

@@ -3,52 +3,44 @@ package com.example.store.controller;
 import com.example.store.dto.CustomerDTO;
 import com.example.store.entity.Customer;
 import com.example.store.mapper.CustomerMapper;
-import com.example.store.repository.CustomerRepository;
+import com.example.store.service.CustomerService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.context.annotation.ComponentScan;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+
 
 @WebMvcTest(CustomerController.class)
-@ComponentScan(basePackageClasses = CustomerMapper.class)
-class CustomerControllerTests {
+public class CustomerControllerTests {
 
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
     private ObjectMapper objectMapper;
-
-
-    @Autowired
+    
+    @MockitoBean
     private CustomerMapper customerMapper;
 
-    
     @Autowired
-    private CustomerController customerController;
-
-
-    @MockitoBean
-    private CustomerRepository customerRepository;
+    private CustomerService customerService;
 
     private Customer customer;
 
@@ -57,11 +49,14 @@ class CustomerControllerTests {
         customer = new Customer();
         customer.setName("John Doe");
         customer.setId(1L);
+
+        CustomerDTO customerDTO = new CustomerDTO();
+        when(customerMapper.customerToCustomerDTO(any(Customer.class))).thenReturn(customerDTO);
     }
 
     @Test
     void testCreateCustomer() throws Exception {
-        when(customerRepository.save(customer)).thenReturn(customer);
+        when(customerService.createCustomer(customer)).thenReturn(customer);
 
         mockMvc.perform(post("/customer")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -69,86 +64,88 @@ class CustomerControllerTests {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name").value("John Doe"));
     }
-
-    @Test
+    
+   @Test
     void testGetAllCustomers() throws Exception {
-        when(customerRepository.findAll()).thenReturn(List.of(customer));
+        // Create test data with pagination
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Customer> customerPage = new PageImpl<>(
+            Collections.emptyList(), 
+            pageable, 
+            0
+        );
 
-        mockMvc.perform(get("/customer"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..name").value("John Doe"));
-        
+        when(customerService.getAllCustomers(pageable)).thenReturn(customerPage);
+
+        mockMvc.perform(get("/api/customers")
+               .param("page", "0")
+               .param("size", "10"))
+               .andExpect(status().isOk());
     }
 
-    @Test
-    void searchCustomersWwithQueryReturnsFiltered() {
-        String query = "john";
+   @Test
+    void searchCustomersWithQueryReturnsFiltered() throws Exception {
         Customer customer1 = new Customer(1L, "John Doe");
         Customer customer2 = new Customer(2L, "Johnny Smith");
-        CustomerDTO dto1 = customerMapper.customerToCustomerDTO(customer1);
-        CustomerDTO dto2 = customerMapper.customerToCustomerDTO(customer2);
+        
+        Page<Customer> customerPage = new PageImpl<>(
+            List.of(customer1, customer2),
+            PageRequest.of(0, 10),
+            2
+        );
 
-        when(customerRepository.findByNameContainingIgnoreCase(query))
-            .thenReturn(Arrays.asList(customer1, customer2));
-        when(customerMapper.customerToCustomerDTO(customer1)).thenReturn(dto1);
-        when(customerMapper.customerToCustomerDTO(customer2)).thenReturn(dto2);
+        when(customerService.searchCustomer(customer1.getName(),any(Pageable.class))).thenReturn(customerPage);
+        when(customerMapper.customerToCustomerDTO(customer1)).thenReturn(new CustomerDTO(1L, "John Doe", List.of()));
+        when(customerMapper.customerToCustomerDTO(customer2)).thenReturn(new CustomerDTO(2L, "Johnny Smith", List.of()));
 
-        List<CustomerDTO> result = customerController.searchCustomers(query);
-
-        assertEquals(2, result.size());
-        assertEquals("John Doe", result.get(0).getName());
-        assertEquals("Johnny Smith", result.get(1).getName());
-        verify(customerRepository).findByNameContainingIgnoreCase(query);
-        verifyNoMoreInteractions(customerRepository);
+        mockMvc.perform(get("/api/customers/search")
+            .param("query", "john")
+            .param("page", "0")
+            .param("size", "10"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.content[*].name", 
+                    containsInAnyOrder("John Doe", "Johnny Smith")))
+            .andExpect(jsonPath("$.totalElements").value(2));
     }
 
     @Test
-    void searchCustomersEmptyQueryReturnsAllCustomers() {
+    void searchCustomersEmptyQueryReturnsAllCustomers() throws Exception {
         Customer customer1 = new Customer(1L, "Alice Wonder");
         Customer customer2 = new Customer(2L, "Bob Builder");
-        CustomerDTO dto1 = customerMapper.customerToCustomerDTO(customer1);
-        CustomerDTO dto2 = customerMapper.customerToCustomerDTO(customer2);
+        Page<Customer> customerPage = new PageImpl<>(
+                    List.of(customer1, customer2),
+                    PageRequest.of(0, 10),
+                    2
+        );
 
+      
 
-        when(customerRepository.findAll()).thenReturn(Arrays.asList(customer1, customer2));
-        when(customerMapper.customersToCustomerDTOs(anyList()))
-            .thenReturn(Arrays.asList(dto1, dto2));
+        when(customerService.getAllCustomers(any(Pageable.class)))
+            .thenReturn(customerPage);
 
-        List<CustomerDTO> result = customerController.searchCustomers(null);
-
-        assertEquals(2, result.size());
-        verify(customerRepository).findAll();
-        verifyNoMoreInteractions(customerRepository);
+        mockMvc.perform(get("/customers")
+                .param("query", "")
+                .param("page", "1")
+                .param("size", "10"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$..name").value(containsInAnyOrder("Alice Wonder", "Bob Builder")));
     }
 
     @Test
-    void searchCustomers_withBlankQuery_returnsAllCustomers() {
-        Customer customer = new Customer(1L, "Test Customer");
-        CustomerDTO dto = customerMapper.customerToCustomerDTO(customer);
+    void searchCustomersNoMatchingResults() throws Exception {
+        Page<Customer> customerBlank = new PageImpl<>(
+                    List.of(),
+                    PageRequest.of(0, 10),
+                    0
+        );
+        when(customerService.searchCustomer(anyString(), any(Pageable.class)))
+            .thenReturn(customerBlank);
 
-        when(customerRepository.findAll()).thenReturn(Collections.singletonList(customer));
-        when(customerMapper.customersToCustomerDTOs(anyList()))
-            .thenReturn(Collections.singletonList(dto));
-
-        List<CustomerDTO> result = customerController.searchCustomers("   ");
-
-        assertEquals(1, result.size());
-        verify(customerRepository).findAll();
-        verifyNoMoreInteractions(customerRepository);
+        mockMvc.perform(get("/customers")
+                .param("query", "nonexistent")
+                .param("page", "1")
+                .param("size", "10"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$").isEmpty());
     }
-
-    @Test
-    void searchCustomers_noMatchingResults_returnsEmptyList() {
-        String query = "nonexistent";
-        when(customerRepository.findByNameContainingIgnoreCase(query))
-            .thenReturn(Collections.emptyList());
-
-        List<CustomerDTO> result = customerController.searchCustomers(query);
-
-        assertTrue(result.isEmpty());
-        verify(customerRepository).findByNameContainingIgnoreCase(query);
-        verifyNoMoreInteractions(customerRepository);
-    }
-
-
 }

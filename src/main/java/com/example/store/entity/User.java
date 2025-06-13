@@ -1,20 +1,23 @@
 package com.example.store.entity;
 
 import jakarta.persistence.*;
+
 import lombok.Data;
 
-import java.util.List;
 
-@Data
+
 @Entity
-public class Product {
+@Data
+@Table(name = "\"user\"")
+public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
-    private String description;
+    private String username;
+    private String password;
+    private String email;
+    public User() {
+    }
 
-    @ManyToMany(mappedBy = "products")
-    private List<Order> orders;
-    
 }

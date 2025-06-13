@@ -46,11 +46,33 @@ paths:
             schema:
               type: object
               properties:
-                id:
+                description:
+                  type: string
+                customerId:
                   type: integer
                   format: int64
-                descriptioon:
-                  type: string
+  /order/{id}:
+    get:
+      summary: Get Order by ID
+      tags:
+        - store
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+            format: int64
+          required: true
+          description: Order ID
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+      operationId: getOrderById
+      description: Get an order by ID
   /customer:
     get:
       summary: Get Customers
@@ -82,11 +104,30 @@ paths:
             schema:
               type: object
               properties:
-                id:
-                  type: integer
-                  format: int64
                 name:
                   type: string
+  /customer/{id}:
+    get:
+      summary: Get Customer by ID
+      tags:
+        - store
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+            format: int64
+          required: true
+          description: Customer ID
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+      operationId: getCustomerById
+      description: Get a customer by ID
   /products:
     get:
       summary: Get Products
@@ -98,17 +139,9 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  id:
-                    type: string
-                  description:
-                    type: string
-                  orders:
-                    type: array
-                    items:
-                      type: integer
-                      format: int64
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
       operationId: getProducts
       description: Get all products
     post:
@@ -126,13 +159,75 @@ paths:
             schema:
               type: object
               properties:
-                id:
-                  type: integer
-                  format: int64
                 description:
                   type: string
-                  x-stoplight:
-                    id: jbh0jzkonppv8
+  /products/by-orders:
+    get:
+      summary: Get Product IDs by Order IDs
+      tags:
+        - store
+      parameters:
+        - in: query
+          name: orderIds
+          schema:
+            type: array
+            items:
+              type: integer
+              format: int64
+          required: true
+          description: Order IDs
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: integer
+                  format: int64
+      operationId: getProductIdsByOrderIds
+      description: Get product IDs by order IDs
+  /customers/search:
+    get:
+      summary: Search Customers
+      tags:
+        - store
+      parameters:
+        - in: query
+          name: query
+          schema:
+            type: string
+          required: true
+          description: Search query
+        - in: query
+          name: page
+          schema:
+            type: integer
+          required: false
+          description: Page number
+        - in: query
+          name: size
+          schema:
+            type: integer
+          required: false
+          description: Page size
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  content:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Customer'
+                  totalElements:
+                    type: integer
+      operationId: searchCustomers
+      description: Search customers by name
 components:
   schemas:
     Order:
@@ -145,13 +240,7 @@ components:
         description:
           type: string
         customer:
-          type: object
-          properties:
-            id:
-              type: integer
-              format: int64
-            description:
-              type: string
+          $ref: '#/components/schemas/Customer'
     Customer:
       title: Customer
       type: object
@@ -164,15 +253,16 @@ components:
         orders:
           type: array
           items:
-            type: object
-            properties:
-              id:
-                type: integer
-                format: int64
-              description:
-                type: string
-                x-stoplight:
-                  id: mq08x82g95zl9
+            $ref: '#/components/schemas/Order'
+    Product:
+      title: Product
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        description:
+          type: string
 tags:
   - name: store
     description: store operations
