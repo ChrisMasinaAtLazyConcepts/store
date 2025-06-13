@@ -25,6 +25,6 @@ jobs:
           push: true
           tags: store:latest
 
-      - name: Build the Maven project
+      - name: Build the Gradle project
         run: |
-          mvn clean package
+         ./gradlew clean build
