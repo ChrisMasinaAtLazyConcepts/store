@@ -1,56 +1,25 @@
 package com.example.store.mapper;
 
 import com.example.store.dto.CustomerDTO;
-import com.example.store.dto.CustomerOrderDTO;
-import com.example.store.dto.OrderDTO;
 import com.example.store.entity.Customer;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
+import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mapstruct.Mapping;
+import org.mapstruct.Mappings;
 
-public abstract class CustomerMapper {
+import java.util.List;
 
-    @Autowired
-    private OrderMapper orderMapper;
+@Mapper(
+        componentModel = "spring",
+        uses = {OrderMapper.class})
+public interface CustomerMapper {
 
-    public CustomerDTO customerToCustomerDTO(Customer customer) {
-        CustomerDTO customerDTO = new CustomerDTO();
-        customerDTO.setId(customer.getId());
-        customerDTO.setName(customer.getName());
-        List<OrderDTO> orderDTOs= orderMapper.ordersToOrderDTOs(customer.getOrders());
-        customerDTO.setOrders(mapOrdersToCustomerOrders(orderDTOs));
-        return customerDTO;
-    }
+    @Mappings({@Mapping(source = "orders", target = "orders")})
+    CustomerDTO customerToCustomerDTO(Customer customer);
 
-List<CustomerOrderDTO> mapOrdersToCustomerOrders(List<OrderDTO> orders) {
-    if (orders == null) {
-        return List.of();
-    }
-    return orders.stream()
-    .map(order -> {
-        CustomerOrderDTO customerOrderDTO = new CustomerOrderDTO();
-        customerOrderDTO.setId(order.getId());
-        customerOrderDTO.setDescription(order.getDescription());
-        return customerOrderDTO;
-    })
-    .collect(Collectors.toList());
-    }
+    @InheritInverseConfiguration
+    Customer customerDTOToCustomer(CustomerDTO customerDTO);
 
-    public Customer customerDTOToCustomer(CustomerDTO customerDTO) {
-        Customer customer = new Customer();
-        customer.setId(customerDTO.getId());
-        customer.setName(customerDTO.getName());
-        List<OrderDTO> orderDTOs= orderMapper.ordersToOrderDTOs(customer.getOrders());
-        customerDTO.setOrders(mapOrdersToCustomerOrders(orderDTOs));
-        return customer;
-    }
-
-    public List<CustomerDTO> customersToCustomerDTOs(List<Customer> customers) {
-        return customers.stream()
-                .map(this::customerToCustomerDTO)
-                .collect(Collectors.toList());
-    }
+    List<CustomerDTO> customersToCustomerDTOs(List<Customer> customers);
 }

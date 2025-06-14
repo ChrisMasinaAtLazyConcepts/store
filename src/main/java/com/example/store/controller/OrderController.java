@@ -4,61 +4,87 @@ import com.example.store.dto.OrderDTO;
 import com.example.store.entity.Order;
 import com.example.store.mapper.OrderMapper;
 import com.example.store.repository.OrderRepository;
+
+import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/orders")
 @RequiredArgsConstructor
+@Tag(name = "Order Controller")
 public class OrderController {
 
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
 
-    /**
-     * Handles requests to get all orders.
-     * 
-     * @return List of OrderDTO objects
-     */
     @GetMapping
-    public List<OrderDTO> getAllOrders() {
-        return orderRepository.findAll()
-            .stream()
-            .map(orderMapper::orderToOrderDTO)
-            .toList();
+    @Operation(summary = "Get all orders")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200")})
+    public ResponseEntity<List<OrderDTO>> getAllOrders() {
+        try {
+            List<OrderDTO> orders = orderRepository.findAll().stream()
+                    .map(orderMapper::orderToOrderDTO)
+                    .toList();
+            return ResponseEntity.ok(orders);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @GetMapping("/by-products")
-    public List<Long> getOrderIdsByProductIds(@RequestParam List<Long> productIds) {
-        return orderRepository.findOrderIdsByProductIds(productIds);
+    @Operation(summary = "Get order IDs by product IDs")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200")})
+    public ResponseEntity<List<Long>> getOrderIdsByProductIds(@RequestParam List<Long> productIds) {
+        try {
+            List<Long> orderIds = orderRepository.findOrderIdsByProductIds(productIds);
+            return ResponseEntity.ok(orderIds);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
-    /**
-     * Handles requests to get an order by ID.
-     * 
-     * @param id : ID of the order
-     * @return OrderDTO object
-     */
     @GetMapping("/{id}")
-    public OrderDTO getOrderById(@PathVariable Long id) {
-        return orderRepository.findById(id)
-            .map(orderMapper::orderToOrderDTO)
-            .orElseThrow(() -> new RuntimeException("Order not found with ID " + id));
+    @Operation(summary = "Get order by ID")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200"), @ApiResponse(responseCode = "404")})
+    public ResponseEntity<OrderDTO> getOrderById(@PathVariable Long id) {
+        try {
+            Order order = orderRepository
+                    .findById(id)
+                    .orElseThrow(() -> new RuntimeException("Order not found with ID " + id));
+            return ResponseEntity.ok(orderMapper.orderToOrderDTO(order));
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
-    /**
-     * Handles requests to create an order.
-     * 
-     * @param orderDTO : OrderDTO object
-     * @return OrderDTO object of the created order
-     */
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public OrderDTO createOrder(@RequestBody OrderDTO orderDTO) {
-        Order order = orderMapper.orderDTOToOrder(orderDTO);
-        return orderMapper.orderToOrderDTO(orderRepository.save(order));
+    @Operation(summary = "Create order")
+    @ApiResponses(value = {@ApiResponse(responseCode = "201"), @ApiResponse(responseCode = "400")})
+    public ResponseEntity<OrderDTO> createOrder(@Valid @RequestBody OrderDTO orderDTO) {
+        try {
+            Order order = orderMapper.orderDTOToOrder(orderDTO);
+            Order savedOrder = orderRepository.save(order);
+            return ResponseEntity.status(HttpStatus.CREATED).body(orderMapper.orderToOrderDTO(savedOrder));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<String> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        return ResponseEntity.badRequest().body("Invalid request body");
     }
 }

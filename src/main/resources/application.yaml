@@ -1,27 +1,45 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5433/store
+    url: jdbc:h2:mem:proddb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
     username: admin
     password: admin
+    driver-class-name: org.h2.Driver
+    hikari:
+      maximum-pool-size: 5
+      connection-timeout: 30000
+  # security: 
+  #   enabled: false
   jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
-      ddl-auto: validate
+    # test
+    # ddl-auto: validate 
+      ddl-auto: update 
+    show-sql: true
     properties:
       hibernate:
         format_sql: true
         use_sql_comments: true
         default_batch_fetch_size: 10
-  liquibase:
-    change-log: classpath:db/changelog/db.changelog-master.yaml     
+        jdbc:
+          lob:
+            non_contextual_creation: true
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info,h2-console
-  endpoint:
-    health:
-      show-details: always
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: false
+        trace: false
+
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+    user: admin
+    password: admin
+    default-schema: PUBLIC
+    contexts: dev
 
 logging:
   level:

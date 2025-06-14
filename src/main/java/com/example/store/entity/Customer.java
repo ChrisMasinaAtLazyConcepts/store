@@ -21,11 +21,9 @@ public class Customer {
     private List<Order> orders = new ArrayList<>();
 
     public Customer(Long id, String name) {
-       this.id= id;
-       this.name= name;
+        this.id = id;
+        this.name = name;
     }
 
-    public Customer() {
-    }
-
+    public Customer() {}
 }

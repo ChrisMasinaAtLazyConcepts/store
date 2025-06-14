@@ -1,16 +1,15 @@
 package com.example.store.dto;
 
-import java.util.List;
-
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
+import java.util.List;
+
 @NoArgsConstructor
+@Data
 public class OrderDTO {
     private Long id;
     private String description;
-    private OrderCustomerDTO customer;
+    private CustomerDTO customer;
     private List<ProductDTO> products;
-
 }

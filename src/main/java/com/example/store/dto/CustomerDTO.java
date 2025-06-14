@@ -10,14 +10,12 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 public class CustomerDTO {
-
-    public CustomerDTO(Long id, String name) 
-    {
-      this.id=id;
-      this.name=name;
+    public CustomerDTO(Long id, String name) {
+        this.id = id;
+        this.name = name;
     }
+
     private Long id;
     private String name;
-    private List<CustomerOrderDTO> orders;
-
+    private List<OrderDTO> orders;
 }
