@@ -1,3 +1,16 @@
+-- default user  password Base64 encoded password
+INSERT INTO store_user (id, username, password, email, role) VALUES 
+(15, 'chris.masina', 'dGhpcyBpcyBhIHRlc3QgcGFzc3dvcmQ', 'chris.masina@secriteaze.com', 'role_user');
+
+--  insert sample prodcuts
+
+INSERT INTO product (id, description) 
+VALUES (1, 'Oats');
+
+INSERT INTO product (id, description) 
+VALUES (2, 'Noodles');
+
+
 INSERT INTO customer (id, name) VALUES (1, 'Muriel Donnelly');
 INSERT INTO customer (id, name) VALUES (2, 'Lance Stiedemann Sr.');
 INSERT INTO customer (id, name) VALUES (3, 'Denise Harris');

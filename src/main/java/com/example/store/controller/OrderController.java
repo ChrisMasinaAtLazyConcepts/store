@@ -33,40 +33,41 @@ public class OrderController {
     @GetMapping
     @Operation(summary = "Get all orders")
     @ApiResponses(value = {@ApiResponse(responseCode = "200")})
-    public ResponseEntity<List<OrderDTO>> getAllOrders() {
+    public ResponseEntity<?> getAllOrders() {
         try {
             List<OrderDTO> orders = orderRepository.findAll().stream()
                     .map(orderMapper::orderToOrderDTO)
                     .toList();
             return ResponseEntity.ok(orders);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body("Failed to get orders");
         }
     }
 
     @GetMapping("/by-products")
     @Operation(summary = "Get order IDs by product IDs")
     @ApiResponses(value = {@ApiResponse(responseCode = "200")})
-    public ResponseEntity<List<Long>> getOrderIdsByProductIds(@RequestParam List<Long> productIds) {
+    public ResponseEntity<?> getOrderIdsByProductIds(@RequestParam List<Long> productIds) {
         try {
             List<Long> orderIds = orderRepository.findOrderIdsByProductIds(productIds);
             return ResponseEntity.ok(orderIds);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest()
+                    .body("Failed to get orders please confim product ids are valid" + e.getMessage());
         }
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Get order by ID")
     @ApiResponses(value = {@ApiResponse(responseCode = "200"), @ApiResponse(responseCode = "404")})
-    public ResponseEntity<OrderDTO> getOrderById(@PathVariable Long id) {
+    public ResponseEntity<?> getOrderById(@PathVariable Long id) {
         try {
             Order order = orderRepository
                     .findById(id)
                     .orElseThrow(() -> new RuntimeException("Order not found with ID " + id));
             return ResponseEntity.ok(orderMapper.orderToOrderDTO(order));
         } catch (Exception e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 

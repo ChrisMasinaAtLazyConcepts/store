@@ -5,3 +5,8 @@ databaseChangeLog:
       changes:
         - sqlFile:
             path: db/changelog/schema.sql
+      id: 2-schema
+      author: chrismasina@securitease.com
+      changes:
+        - sqlFile:
+            path: db/changelog/schema.sql
