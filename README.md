@@ -1,6 +1,58 @@
 # Store Application
 The Store application keeps track of customers and orders in a database.
 
+How to run the Application
+<pre>gradle bootRun</pre>
+
+POST http://localhost:8080/store/orders
+
+Example Order request
+<pre>
+{
+  "description": "Order test",
+  "customer": {
+    "id": 1,
+    "name": "Muriel Donnelly"
+  },
+  "products": [
+    {
+      "id": 1,
+      "description": "Oats"
+    },
+    {
+      "id": 2,
+      "description": "Noodles"
+    }
+  ]
+}
+</pre>
+
+GET http://localhost:8080/store/orders/79
+Example Order response
+<pre>
+  {
+  "id": 79,
+  "description": "Order test",
+  "customer":{
+  "id": 1,
+  "name": "Muriel Donnelly"
+  },
+  "products":[
+    {
+      "id": 1,
+      "description": "Oats",
+      "orderIds":[96, 97, 98, 99, 100,]
+    },
+    {
+      "id": 2,
+      "description": "Noodles",
+      "orderIds":[96, 97, 98, 99, 100, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91,…]
+    }
+  ]
+}
+</pre>
+
+
 # Assumptions
 This README assumes you're using a posix environment. It's possible to run this on Windows as well:
 * Instead of `./gradlew` use `gradlew.bat`

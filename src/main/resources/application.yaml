@@ -15,12 +15,11 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     properties:
       hibernate:
-        show-sql: true
+        show-sql: false
         ddl-auto: validate
         format_sql: true
         use_sql_comments: true
         default_batch_fetch_size: 10
-
   liquibase:
     enabled: true
     change-log: classpath:db/changelog/db.changelog-master.yaml
@@ -34,6 +33,6 @@ spring:
 
 logging:
   level:
-    org.hibernate.SQL: DEBUG
+    org.hibernate.SQL: INFO
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
     org.liquibase: INFO

@@ -5,11 +5,15 @@ import com.example.store.entity.Product;
 import com.example.store.mapper.ProductMapper;
 import com.example.store.repository.ProductRepository;
 
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -22,9 +26,9 @@ public class ProductService {
     @Autowired
     ProductMapper productMapper;
 
-    public ProductDTO createProduct(ProductDTO productDTO) {
+    public Product createProduct(ProductDTO productDTO) {
         Product product = productMapper.productDTOToProduct(productDTO);
-        return productMapper.productToProductDTO(productRepository.save(product));
+        return productRepository.save(product);
     }
 
     @GetMapping
@@ -35,15 +39,18 @@ public class ProductService {
     }
 
     @GetMapping("/{id}")
-    public ProductDTO getProductById(@PathVariable Long id) {
+    public Product getProductById(@PathVariable Long id) {
+        if(id == 0){
+            new BadRequestException("Product id cannot be null ");
+        }
         return productRepository
                 .findById(id)
-                .map(productMapper::productToProductDTO)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
     }
 
     @GetMapping("/by-orders")
     public List<Long> getProductIdsByOrderIds(@RequestParam List<Long> orderIds) {
+        
         return productRepository.findProductIdsByOrdersIdIn(orderIds);
     }
 }

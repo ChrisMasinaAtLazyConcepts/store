@@ -6,7 +6,7 @@ databaseChangeLog:
         - sqlFile:
             path: db/changelog/data.sql
       id: 3-data
-      author: developer@securitease.com
+      author: chrismasina@securitease.com
       changes:
         - sqlFile:
             path: db/changelog/data.sql

@@ -1,7 +1,12 @@
 package com.example.store.controller;
 
 import com.example.store.dto.ProductDTO;
+import com.example.store.entity.Product;
+import com.example.store.mapper.ProductMapper;
+import com.example.store.repository.OrderRepository;
+import com.example.store.security.JwtUserDetailsService;
 import com.example.store.service.ProductService;
+import com.example.store.util.TokenUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.junit.jupiter.api.Test;
@@ -20,6 +25,8 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import com.example.store.controller.ProductController;
+
 
 @AutoConfigureMockMvc(addFilters = false)
 @WebMvcTest(ProductController.class)
@@ -31,15 +38,26 @@ public class ProductControllerTests {
     @MockitoBean
     private ProductService productService;
 
+    @MockitoBean
+    private OrderRepository orderRepository;
+    
+    @MockitoBean
+    private JwtUserDetailsService jwtUserDetailsService;
+
+    @MockitoBean
+    private TokenUtils tokenUtils;
+
     @Test
     public void testCreateProduct() throws Exception {
-        ProductDTO productDTO = new ProductDTO();
-        productDTO.setId(1L);
-        productDTO.setDescription("Test Product");
+       Product product = new Product();
+       product.setDescription("Oats");
 
-        when(productService.createProduct(any(ProductDTO.class))).thenReturn(productDTO);
+       ProductDTO productDTO = new ProductDTO();
+       productDTO.setId(1L);
 
-        mockMvc.perform(post("/products")
+        when(productService.createProduct(any(ProductDTO.class))).thenReturn(product);
+
+        mockMvc.perform(post("/store/products")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(productDTO)))
                 .andExpect(status().isCreated())
@@ -56,20 +74,20 @@ public class ProductControllerTests {
 
         when(productService.getAllProducts()).thenReturn(products);
 
-        mockMvc.perform(get("/products"))
+        mockMvc.perform(get("/store/products"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1));
     }
 
     @Test
     public void testGetProductById() throws Exception {
-        ProductDTO productDTO = new ProductDTO();
-        productDTO.setId(1L);
-        productDTO.setDescription("Test Product");
+        Product product = new Product();
+        product.setDescription("Test Product");
 
-        when(productService.getProductById(anyLong())).thenReturn(productDTO);
 
-        mockMvc.perform(get("/products/1"))
+        when(productService.createProduct(any(ProductDTO.class))).thenReturn(product);
+
+        mockMvc.perform(get("/store/products/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.description").value("Test Product"));
@@ -78,7 +96,7 @@ public class ProductControllerTests {
     @Test
     public void testGetProductByIdNotFound() throws Exception {
         when(productService.getProductById(anyLong())).thenReturn(null);
-        mockMvc.perform(get("/products/100")).andExpect(status().isNotFound());
+        mockMvc.perform(get("/store/products/100")).andExpect(status().isNotFound());
     }
 
     @Test
@@ -87,14 +105,14 @@ public class ProductControllerTests {
 
         when(productService.getProductIdsByOrderIds(anyList())).thenReturn(productIds);
 
-        mockMvc.perform(get("/products/by-orders").param("orderIds", "1", "2"))
+        mockMvc.perform(get("/store/products/by-orders").param("orderIds", "1", "2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2));
     }
 
     @Test
     public void testCreateProductNull() throws Exception {
-        mockMvc.perform(post("/products")
+        mockMvc.perform(post("/store/products")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(null)))
                 .andExpect(status().isBadRequest());
@@ -102,7 +120,7 @@ public class ProductControllerTests {
 
     @Test
     public void testGetProductIdsByOrderIdsNull() throws Exception {
-        mockMvc.perform(get("/products/by-orders").param("orderIds", "")).andExpect(status().isBadRequest());
+        mockMvc.perform(get("/store/products/by-orders")).andExpect(status().isBadRequest());
     }
 
     public static String asJsonString(final Object obj) {

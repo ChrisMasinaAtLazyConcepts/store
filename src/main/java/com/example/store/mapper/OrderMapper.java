@@ -2,10 +2,9 @@ package com.example.store.mapper;
 
 import com.example.store.dto.OrderDTO;
 import com.example.store.entity.Order;
-
+import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Mappings;
 
 import java.util.List;
 
@@ -14,10 +13,11 @@ import java.util.List;
         uses = {CustomerMapper.class, ProductMapper.class})
 public interface OrderMapper {
 
-    @Mappings({@Mapping(source = "customer", target = "customer"), @Mapping(source = "products", target = "products")})
+    @Mapping(target = "customer", source = "customer")
+    @Mapping(target = "products", source = "products")
     OrderDTO orderToOrderDTO(Order order);
 
-    // @Mappings({@Mapping(target = "id", ignore = true)})
+    @InheritInverseConfiguration
     Order orderDTOToOrder(OrderDTO orderDTO);
 
     List<OrderDTO> ordersToOrderDTOs(List<Order> orders);

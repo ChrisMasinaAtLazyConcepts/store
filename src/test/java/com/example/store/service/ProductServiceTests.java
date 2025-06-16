@@ -31,14 +31,14 @@ public class ProductServiceTests {
     @Test
     void testCreateProduct() {
         Product product = new Product();
-        ProductDTO productDTO = new ProductDTO();
+        
         when(productMapper.productDTOToProduct(any(ProductDTO.class))).thenReturn(product);
         when(productRepository.save(any(Product.class))).thenReturn(product);
-        when(productMapper.productToProductDTO(any(Product.class))).thenReturn(productDTO);
+        ProductDTO productDTO = new ProductDTO();
+        productDTO.setDescription("Test");
+        Product result = productService.createProduct(productDTO);
 
-        ProductDTO result = productService.createProduct(productDTO);
-
-        assertEquals(productDTO, result);
+        assertEquals(product, result);
     }
 
     @Test
@@ -56,12 +56,10 @@ public class ProductServiceTests {
     @Test
     void testGetProductById() {
         Product product = new Product();
-        ProductDTO productDTO = new ProductDTO();
         when(productRepository.findById(1L)).thenReturn(Optional.of(product));
-        when(productMapper.productToProductDTO(any(Product.class))).thenReturn(productDTO);
 
-        ProductDTO result = productService.getProductById(1L);
+        Product result = productService.getProductById(1L);
 
-        assertEquals(productDTO, result);
+        assertEquals(product, result);
     }
 }

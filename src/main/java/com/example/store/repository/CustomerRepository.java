@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
-    @Query("SELECT c FROM Customer c WHERE LOWER(c.name) LIKE LOWER(CONCAT('%', :query, '%'))")
+    @Query("SELECT c FROM Customer c WHERE LOWER(c.name) LIKE LOWER(CONCAT('%', :queryString, '%'))")
     Page<Customer> findByNameContainingIgnoreCase(String queryString, Pageable pageable);
 
     Page<Customer> findAll(Pageable pageable);

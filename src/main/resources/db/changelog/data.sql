@@ -10,7 +10,6 @@ VALUES (1, 'Oats');
 INSERT INTO product (id, description) 
 VALUES (2, 'Noodles');
 
-
 INSERT INTO customer (id, name) VALUES (1, 'Muriel Donnelly');
 INSERT INTO customer (id, name) VALUES (2, 'Lance Stiedemann Sr.');
 INSERT INTO customer (id, name) VALUES (3, 'Denise Harris');

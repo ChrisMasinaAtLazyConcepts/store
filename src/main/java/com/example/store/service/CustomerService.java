@@ -3,6 +3,9 @@ package com.example.store.service;
 import com.example.store.entity.Customer;
 import com.example.store.repository.CustomerRepository;
 
+import java.util.NoSuchElementException;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -16,7 +19,11 @@ public class CustomerService {
     CustomerRepository repository;
 
     public Customer getCustomer(Long id) {
-        return repository.findById(id).orElseThrow();
+        Optional<Customer> customer =repository.findById(id);
+        if(!customer.isPresent()){
+            throw new NoSuchElementException();
+        }
+        return repository.findById(id).get();
     }
 
     @Cacheable("customers")
@@ -28,7 +35,7 @@ public class CustomerService {
         return repository.findByNameContainingIgnoreCase(query, pageable);
     }
 
-    public Object createCustomer(Customer customer) {
+    public Customer createCustomer(Customer customer) {
         return repository.save(customer);
     }
 }
