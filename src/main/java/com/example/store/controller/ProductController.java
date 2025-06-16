@@ -2,14 +2,12 @@ package com.example.store.controller;
 
 import com.example.store.dto.ProductDTO;
 import com.example.store.entity.Product;
-import com.example.store.mapper.ProductMapper;
 import com.example.store.service.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import io.swagger.v3.oas.annotations.Operation;

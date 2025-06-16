@@ -1,7 +1,5 @@
 package com.example.store.config;
 
-import com.example.store.security.JwtRequestFilter;
-import com.example.store.util.TokenUtils;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
