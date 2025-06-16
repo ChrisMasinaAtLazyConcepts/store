@@ -3,10 +3,8 @@ package com.example.store.controller;
 import com.example.store.dto.ProductDTO;
 import com.example.store.entity.Product;
 import com.example.store.repository.OrderRepository;
-import com.example.store.security.JwtUserDetailsService;
 import com.example.store.service.ProductService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -38,8 +36,6 @@ public class ProductControllerTests {
     @MockitoBean
     private OrderRepository orderRepository;
     
-    @MockitoBean
-    private JwtUserDetailsService jwtUserDetailsService;
 
     @Test
     public void testCreateProduct() throws Exception {
@@ -100,6 +96,18 @@ public class ProductControllerTests {
     @Test
     public void testGetProductIdsByOrderIdsNull() throws Exception {
         mockMvc.perform(get("/store/products/by-orders")).andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testGetProductById()throws Exception {
+        Product product = new Product();
+        product.setId(1L);
+        product.setDescription("Test Product");
+
+        when(productService.getProductById(1L)).thenReturn(product);
+
+        mockMvc.perform(get("/store/products?/id=1"))
+                .andExpect(status().isOk());
     }
 
     public static String asJsonString(final Object obj) {
