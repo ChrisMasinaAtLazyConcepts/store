@@ -9,10 +9,10 @@ import lombok.Data;
 @Table(name = "\"store_user\"")
 public class User {
 
+ 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq")
+    @SequenceGenerator(name = "user_seq", sequenceName = "user_id_seq", allocationSize = 1)
 
     private String username;
     private String password;

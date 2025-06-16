@@ -26,10 +26,10 @@ public class ProductRepositoryTests {
     @Autowired
     private CustomerRepository customerRepository;
     
-      @BeforeEach
-        public void setup() {
-            productRepository.deleteAllInBatch();
-        }
+    @BeforeEach
+    public void setup() {
+        productRepository.deleteAllInBatch();
+    }
 
     @Test
     public void testFindProductIdsByOrdersIdIn() {

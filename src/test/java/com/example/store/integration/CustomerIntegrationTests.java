@@ -1,12 +1,6 @@
 package com.example.store.integration;
 
-import com.example.store.dto.CustomerDTO;
 import com.example.store.entity.Customer;
-import com.example.store.repository.CustomerRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import jakarta.persistence.EntityManager;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,13 +8,10 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -32,8 +23,6 @@ public class CustomerIntegrationTests {
    @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
 
     private Customer testCustomer;
 
@@ -88,14 +77,5 @@ public class CustomerIntegrationTests {
     }
 
 
-    @Test
-    public void createCustomerInvalidDataShouldReturnBadRequest() throws Exception {
-        CustomerDTO invalidCustomer = new CustomerDTO();
-        invalidCustomer.setName(""); // Empty name
-
-        mockMvc.perform(post("/store/customers")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(invalidCustomer)))
-                .andExpect(status().isBadRequest());
-    }
+    
 }

@@ -34,5 +34,5 @@ spring:
 logging:
   level:
     org.hibernate.SQL: INFO
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.hibernate.type.descriptor.sql.BasicBinder: INFO
     org.liquibase: INFO

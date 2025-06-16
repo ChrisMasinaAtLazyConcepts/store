@@ -2,15 +2,12 @@ package com.example.store.controller;
 
 import com.example.store.dto.OrderDTO;
 import com.example.store.entity.Order;
-import com.example.store.entity.Product;
 import com.example.store.mapper.OrderMapper;
 import com.example.store.repository.OrderRepository;
 import com.example.store.repository.ProductRepository;
 import com.example.store.security.JwtUserDetailsService;
 import com.example.store.service.OrderService;
-import com.example.store.util.TokenUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.example.store.controller.OrderController;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -53,11 +50,6 @@ public class OrderControllerTests {
 
     @MockitoBean
     private JwtUserDetailsService jwtUserDetailsService;
-
-    @MockitoBean
-    private TokenUtils tokenUtils;
-
-    
 
     @AfterEach
     public void cleanup() {

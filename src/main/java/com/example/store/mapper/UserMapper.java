@@ -15,7 +15,6 @@ public interface UserMapper {
 
     @BeanMapping(ignoreByDefault = true)
     @Mappings({
-        @Mapping(target = "id", source = "id"),
         @Mapping(target = "username", source = "username"),
         @Mapping(target = "email", source = "email"),
         @Mapping(target = "password", ignore = true)

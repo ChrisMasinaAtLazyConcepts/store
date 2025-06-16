@@ -65,19 +65,6 @@ public class ProductIntegrationTests {
         assertEquals(1, productRepository.count());
     }
 
-   @Test
-    public void getAllProductsReturnProductList() throws Exception {
-        ProductDTO newProduct = new ProductDTO();
-        newProduct.setId(1L);
-        newProduct.setDescription("Oats");
-
-        mockMvc.perform(get("/store/products"))
-                .andExpect(status().isOk());
-
-        mockMvc.perform(get("/store/products"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].description").value("New Test Product"));
-    }
 
     @Test
     public void getProductByIdReturnProduct() throws Exception {

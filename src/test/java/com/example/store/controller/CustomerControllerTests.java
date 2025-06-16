@@ -3,11 +3,9 @@ package com.example.store.controller;
 import com.example.store.dto.CustomerDTO;
 import com.example.store.entity.Customer;
 import com.example.store.mapper.CustomerMapper;
-import com.example.store.repository.CustomerRepository;
 import com.example.store.repository.OrderRepository;
 import com.example.store.security.JwtUserDetailsService;
 import com.example.store.service.CustomerService;
-import com.example.store.util.TokenUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.junit.jupiter.api.Test;
@@ -45,9 +43,6 @@ public class CustomerControllerTests {
 
     @MockitoBean
     private JwtUserDetailsService jwtUserDetailsService;
-
-    @MockitoBean
-    private TokenUtils tokenUtils;
 
     @MockitoBean
     private OrderRepository orderRepository;
