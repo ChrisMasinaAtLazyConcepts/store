@@ -32,7 +32,7 @@ public class ProductController {
     public ResponseEntity<?> createProduct(@Valid @RequestBody ProductDTO productDTO) {
         try {
             if (productDTO == null) {
-                return ResponseEntity.badRequest().body(null);
+                return ResponseEntity.badRequest().body("Error creating product cannot be null");
             }
             Product product = productService.createProduct(productDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(product);
