@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Data
+@Table(name = "\"customer\"")
 public class Customer {
 
     @Id
