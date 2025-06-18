@@ -30,14 +30,14 @@ public class ProductService {
         return productRepository.save(product);
     }
 
-    @GetMapping
+ 
     public List<ProductDTO> getAllProducts() {
         return productRepository.findAll().stream()
                 .map(productMapper::productToProductDTO)
                 .toList();
     }
 
-    @GetMapping("/{id}")
+
     public Product getProductById(@PathVariable Long id) {
         if(id == 0){
             new BadRequestException("Product id cannot be null ");
@@ -47,7 +47,6 @@ public class ProductService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
     }
 
-    @GetMapping("/by-orders")
     public List<Long> getProductIdsByOrderIds(@RequestParam List<Long> orderIds) {
         
         return productRepository.findProductIdsByOrdersIdIn(orderIds);
